@@ -10,6 +10,8 @@ class EmployeeGenerator {
 public:
   static std::vector<ptmk::EmployeeModel> getEmployeeVector1M();
 
+  static std::vector<ptmk::EmployeeModel> getEmployeeVectorMaleF();
+
 private:
   inline static const std::vector<std::string> surnames_female = {
       "Anderson", "Brown",    "Carter",    "Davis",   "Evans",  "Fisher",
@@ -50,6 +52,6 @@ private:
       std::chrono::year(1970), std::chrono::month(1), std::chrono::day(1)};
 
 private:
-  static std::string getFullname(bool);
+  static std::string getFullname(bool, size_t = 0);
   static std::chrono::year_month_day getBirthDate();
 };

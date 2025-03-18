@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <string>
 
 #include "SQLiteCpp/Database.h"
 
@@ -7,6 +8,7 @@
 #include "EmployeeGen.h"
 #include "EmployeeModel.h"
 #include "Logger.h"
+#include "Timer.h"
 
 Application::Application(int argc, char *argv[]) : m_settings(argc, argv) {}
 
@@ -57,31 +59,46 @@ int Application::run() {
 void Application::create_table(SQLite::Database &db) {
   ptmk::EmployeeModel::CreateTable(db);
 }
+
 void Application::insertOne(SQLite::Database &db) {
   m_settings.getEmployee().insertUpdate(db);
 }
+
 void Application::select(SQLite::Database &db) {
   Logger::GetInstance().Log("Selecting from database");
   auto data = ptmk::EmployeeModel::select(db);
   for (auto &elem : data)
     Logger::GetInstance().Write(elem);
 }
+
 void Application::randomized_insert_bunch(SQLite::Database &db) {
   Logger::GetInstance().Log("Start generating pseudorandom employees");
   auto vec = EmployeeGenerator::getEmployeeVector1M();
   Logger::GetInstance().Log("Finished generating pseudorandom employees");
 
-  Logger::GetInstance().Log("Start inserting each employee one by one");
+  Logger::GetInstance().Log("Start inserting each employee in bunch");
   ptmk::EmployeeModel::InsertBunch(db, std::move(vec));
   Logger::GetInstance().Log("Finished inserting");
+
+  auto vec2 = EmployeeGenerator::getEmployeeVectorMaleF();
+  Logger::GetInstance().Log("Got vector of size " +
+                            std::to_string(vec2.size()) +
+                            " with Males whose surname starting with F");
+  ptmk::EmployeeModel::InsertBunch(db, std::move(vec2));
+  Logger::GetInstance().Log("Inserted the vector");
 }
+
 void Application::select_filter(SQLite::Database &db) {
   std::string filter = "WHERE \"fullname\" LIKE \"F%\" AND \"gender\"=\"Male\"";
   Logger::GetInstance().Log("Selecting from database all males "
                             "whose surnames start with F");
+  auto start = Timer::GetTime();
   auto data = ptmk::EmployeeModel::select(db, filter);
-  Logger::GetInstance().Log("Got vector from database");
-  Logger::GetInstance().Log("Vector size: " + std::to_string(data.size()));
+  Logger::GetInstance().Log("Retrieving data from database took " +
+                            Timer::GetDifferenceString(start) +
+                            " milliseconds");
+  Logger::GetInstance().Log("Got vector from database with size: " +
+                            std::to_string(data.size()));
   // for (auto &elem : data)
   //   Logger::GetInstance().Write("Employee = " + std::string(elem));
 }

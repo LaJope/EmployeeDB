@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -53,6 +54,7 @@ void EmployeeModel::CreateTable(SQLite::Database &db) {
 
 void EmployeeModel::InsertBunch(SQLite::Database &db,
                                 std::vector<EmployeeModel> &&data) {
+  static size_t FMale = 0;
   size_t dataSize = data.size();
   std::string base_query =
       "INSERT INTO Employee (fullname, birthDate, gender) VALUES";
@@ -60,6 +62,8 @@ void EmployeeModel::InsertBunch(SQLite::Database &db,
   Logger::GetInstance().Log("Got " + std::to_string(dataSize) +
                             " Employees to insert into database");
   for (size_t i = 0; i < dataSize; i++) {
+    if (data[i].getName()[0] == 'F' && data[i].getGenderString() == "Male")
+      FMale++;
     curr_query += " " + std::string(data[i]);
     if ((i + 1) % MAX_BUNCH_SIZE == 0 || (i == dataSize - 1)) {
       SQLite::Statement stmt(db, curr_query);
@@ -71,6 +75,7 @@ void EmployeeModel::InsertBunch(SQLite::Database &db,
     } else
       curr_query += ",";
   }
+  Logger::GetInstance().Log("Amount of Males with F: " + std::to_string(FMale));
 }
 
 std::vector<EmployeeModel> EmployeeModel::select(SQLite::Database &db,

@@ -20,10 +20,28 @@ std::vector<ptmk::EmployeeModel> EmployeeGenerator::getEmployeeVector1M() {
   return result;
 }
 
+std::vector<ptmk::EmployeeModel> EmployeeGenerator::getEmployeeVectorMaleF() {
+  size_t vectorSize = names_male.size() * patronymics_male.size();
+  std::vector<ptmk::EmployeeModel> result;
+  result.reserve(vectorSize);
+  for (size_t ind = 0; ind < vectorSize; ind++) {
+    result.emplace_back(getFullname(true, 5), getBirthDate(),
+                        ptmk::EmployeeModel::MALE);
+  }
+  return result;
+}
+
 // EmployeeGenerator private
 
-std::string EmployeeGenerator::getFullname(bool genderMale) {
-  static size_t surnames = 0, names = 0, patronymics = 0;
+std::string EmployeeGenerator::getFullname(bool genderMale,
+                                           size_t startSurname) {
+  static size_t surnames = startSurname, names = 0, patronymics = 0;
+
+  if (startSurname != 0) {
+    surnames = startSurname;
+    names = 0;
+    patronymics = 0;
+  }
 
   size_t curr_sur = surnames, curr_name = names, curr_pat = patronymics;
   if (genderMale)

@@ -25,6 +25,4 @@ private:
 
 private:
   Logger() {}
-
-  static std::string GetTime();
 };
