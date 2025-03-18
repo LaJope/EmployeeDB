@@ -2,11 +2,9 @@
 
 #include <chrono>
 #include <ostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include "Logger.h"
 #include "SQLiteCpp/Database.h"
 
 #include "IModel.h"
@@ -38,25 +36,19 @@ public:
 
   void insertInto(SQLite::Database &) override;
 
-  int32_t getID() { return m_id; }
-  std::string getName() { return m_fullname; }
-  std::string getBirthDateString() {
-    std::ostringstream str;
-    str << m_birthDate;
-    return str.str();
-  }
-  std::string getGenderString() {
-    return (m_gender == MALE ? "Male" : "Female");
-  }
+  int64_t getID();
+  std::string getName();
+  std::string getBirthDateString();
+  std::string getGenderString();
 
-  bool isValid() { return m_id != -2; }
+  bool isValid();
 
   std::ostream &operator<<(std::ostream &);
 
   operator std::string();
 
 private:
-  int32_t m_id = -2;
+  int64_t m_id = -2;
   std::string m_fullname;
   std::chrono::year_month_day m_birthDate;
   Gender m_gender;

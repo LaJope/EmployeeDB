@@ -100,6 +100,19 @@ void EmployeeModel::insertInto(SQLite::Database &db) {
   stmt.executeStep();
 }
 
+int64_t EmployeeModel::getID() { return m_id; }
+std::string EmployeeModel::getName() { return m_fullname; }
+std::string EmployeeModel::getBirthDateString() {
+  std::ostringstream str;
+  str << m_birthDate;
+  return str.str();
+}
+std::string EmployeeModel::getGenderString() {
+  return (m_gender == MALE ? "Male" : "Female");
+}
+
+bool EmployeeModel::isValid() { return m_id != -2; }
+
 std::ostream &EmployeeModel::operator<<(std::ostream &out) {
   if (!isValid()) {
     Logger::GetInstance().Error(

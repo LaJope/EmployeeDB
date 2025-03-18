@@ -1,3 +1,4 @@
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <ostream>
@@ -11,6 +12,30 @@ Logger &Logger::GetInstance() {
   static Logger logger;
   return logger;
 }
+
+#include <iostream>
+#include <chrono>
+// #include <iomanip>
+// #include <sstream>
+
+
+// !!!
+// std::string Logger::GetTime() {
+//     const auto now = std::chrono::system_clock::now();
+//
+//     const std::time_t t_c = std::chrono::system_clock::to_time_t(now);
+//
+//     std::tm tm = *std::localtime(&t_c);
+//
+//     const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+//                         now.time_since_epoch()) % 1000;
+//
+//     std::ostringstream oss;
+//     oss << std::put_time(&tm, "%a %b %d %H:%M:%S") << "." << std::setfill('0') 
+//         << std::setw(3) << ms.count();
+//
+//     return oss.str();
+// }
 
 std::string Logger::GetTime() {
   const auto now = std::chrono::system_clock::now();

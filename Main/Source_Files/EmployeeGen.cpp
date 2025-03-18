@@ -1,42 +1,57 @@
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include <vector>
 
 #include "EmployeeGen.h"
 #include "EmployeeModel.h"
+#include "Logger.h"
 
-namespace PseudoRandomEmployee {
+// EmployeeGenerator public
 
-std::string getFullname(int &patronymic, int &name, int &surname,
-                        bool genderMale) {
-  int curr_pat = patronymic++, curr_name = name, curr_sur = surname;
-  if (patronymic == 10) {
-    patronymic = 0;
-    name++;
-  }
-  if (name == 10) {
-    name = 0;
-    surname = (surname + 1) % 26;
-  }
-
-  if (genderMale)
-    return surnames_male[curr_sur] + " " + names_male[curr_name] + " " +
-           patronymics_male[curr_pat];
-  return surnames_female[curr_sur] + " " + names_female[curr_name] + " " +
-         patronymics_female[curr_pat];
-}
-std::chrono::year_month_day getBirthDate(int &) {
-  return std::chrono::year_month_day(
-      std::chrono::year(2000), std::chrono::month(2), std::chrono::day(20));
-}
-
-std::vector<ptmk::EmployeeModel> getEmployeeVector() {
+std::vector<ptmk::EmployeeModel> EmployeeGenerator::getEmployeeVector1M() {
+  Logger::GetInstance().Log("Start generating pseudorandom employees");
   std::vector<ptmk::EmployeeModel> result;
-  int surname = 0, name = 0, patronymics = 0, birthDate = 0;
-  for (uint64_t ind = 0; ind < RANDOM_NAME_COUNT; ind++)
-    result.emplace_back(getFullname(patronymics, name, surname, true),
-                        getBirthDate(birthDate), ptmk::EmployeeModel::MALE);
+  result.reserve(UNIQUE_NAME_COUNT * 2);
+  for (size_t ind = 0; ind < UNIQUE_NAME_COUNT; ind++) {
+    result.emplace_back(getFullname(true), getBirthDate(),
+                        ptmk::EmployeeModel::MALE);
+    result.emplace_back(getFullname(false), getBirthDate(),
+                        ptmk::EmployeeModel::FEMALE);
+  }
+  Logger::GetInstance().Log("Finished generating pseudorandom employees");
   return result;
 }
 
-} // namespace PseudoRandomEmployee
+// EmployeeGenerator private
+
+std::string EmployeeGenerator::getFullname(bool genderMale) {
+  static size_t surnames = 0, names = 0, patronymics = 0;
+
+  size_t curr_sur = surnames, curr_name = names, curr_pat = patronymics;
+  if (genderMale)
+    return surnames_male[curr_sur] + " " + names_male[curr_name] + " " +
+           patronymics_male[curr_pat];
+
+  if (++surnames == surnames_male.size()) {
+    surnames = 0;
+    names++;
+  }
+  if (names == names_male.size()) {
+    names = 0;
+    patronymics = (patronymics + 1) % patronymics_male.size();
+  }
+  return surnames_female[curr_sur] + " " + names_female[curr_name] + " " +
+         patronymics_female[curr_pat];
+}
+
+std::chrono::year_month_day EmployeeGenerator::getBirthDate() {
+  static uint16_t add = 0;
+
+  uint16_t currAdd = add;
+  add = (add + 1) % BIRTHDAY_COUNT;
+
+  return {START_BIRTHDAY.year() + std::chrono::years(currAdd / 12),
+          START_BIRTHDAY.month() + std::chrono::months(currAdd),
+          START_BIRTHDAY.day() + std::chrono::days(currAdd)};
+}
