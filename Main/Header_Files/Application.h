@@ -17,5 +17,5 @@ private:
   void insertOne(SQLite::Database &);
   void select(SQLite::Database &);
   void randomized_insert_bunch(SQLite::Database &);
-  void select_filter(SQLite::Database &, std::string filter);
+  void select_filter(SQLite::Database &);
 };

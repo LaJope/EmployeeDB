@@ -40,31 +40,42 @@ EmployeeModel::EmployeeModel(std::string name,
 EmployeeModel::~EmployeeModel() {}
 
 void EmployeeModel::CreateTable(SQLite::Database &db) {
-  db.exec("CREATE TABLE Employee ("
-          "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
-          "fullname VARCHAR(100) NOT NULL, "
-          "birthDate DATE NOT NULL "
-          "CHECK(birthDate IS strftime('%Y-%m-%d', birthDate)), "
-          "gender TEXT CHECK(gender IN (\"Male\", \"Female\")) NOT NULL)");
+  const std::string create_query =
+      "CREATE TABLE Employee ("
+      "ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, "
+      "fullname VARCHAR(100) NOT NULL, "
+      "birthDate DATE NOT NULL "
+      "CHECK(birthDate IS strftime('%Y-%m-%d', birthDate)), "
+      "gender TEXT CHECK(gender IN (\"Male\", \"Female\")) NOT NULL)";
+  db.exec(create_query);
   Logger::GetInstance().Log("Created Employee table");
 }
-void EmployeeModel::InsertBunch(SQLite::Database &,
-                                std::vector<EmployeeModel> &) {}
-std::vector<EmployeeModel> EmployeeModel::selectAll(SQLite::Database &db,
-                                                    uint8_t sort) {
-  std::string select = "SELECT * FROM Employee";
-  if (sort & EMPLOYEE_FULLNAME) {
-    select += " ORDER BY fullname";
-    select += +((sort & DESC) ? " DESC" : " ASC");
+
+void EmployeeModel::InsertBunch(SQLite::Database &db,
+                                std::vector<EmployeeModel> &&data) {
+  size_t dataSize = data.size();
+  std::string base_query =
+      "INSERT INTO Employee (fullname, birthDate, gender) VALUES";
+  std::string curr_query = base_query;
+  Logger::GetInstance().Log("Got " + std::to_string(dataSize) +
+                            " Employees to insert into database");
+  for (size_t i = 0; i < dataSize; i++) {
+    curr_query += " " + std::string(data[i]);
+    if ((i + 1) % MAX_BUNCH_SIZE == 0 || (i == dataSize - 1)) {
+      SQLite::Statement stmt(db, curr_query);
+      stmt.executeStep();
+      Logger::GetInstance().Log("Sent " +
+                                std::to_string(i % MAX_BUNCH_SIZE + 1) +
+                                " Employees to database");
+      curr_query = base_query;
+    } else
+      curr_query += ",";
   }
-  if (sort & EMPLOYEE_BIRTHDATE) {
-    select += " ORDER BY birthDate";
-    select += +((sort & DESC) ? " DESC" : " ASC");
-  }
-  if (sort & EMPLOYEE_GENDER) {
-    select += " ORDER BY gender";
-    select += +((sort & DESC) ? " DESC" : " ASC");
-  }
+}
+
+std::vector<EmployeeModel> EmployeeModel::select(SQLite::Database &db,
+                                                 std::string options) {
+  std::string select = "SELECT * FROM Employee " + options;
 
   std::vector<EmployeeModel> result;
 
@@ -77,27 +88,48 @@ std::vector<EmployeeModel> EmployeeModel::selectAll(SQLite::Database &db,
 
   return result;
 }
-std::vector<EmployeeModel> EmployeeModel::selectFilter(SQLite::Database &,
-                                                       std::string, uint8_t) {
-  return {};
-}
 
-void EmployeeModel::insertInto(SQLite::Database &db) {
-  std::string query;
-  if (m_id == -1)
-    query = "INSERT INTO Employee (fullname, birthDate, gender) "
-            "VALUES (?, ?, ?)";
-  else
-    query = "UPDATE Employee SET fullname=?, birthDate=?, gender=? WHERE ID=?";
+void EmployeeModel::insert(SQLite::Database &db) {
+  std::string query =
+      "INSERT INTO Employee (fullname, birthDate, gender) VALUES (?, ?, ?)";
+
   SQLite::Statement stmt(db, query);
   stmt.bind(1, m_fullname);
   stmt.bind(2, getBirthDateString());
   stmt.bind(3, getGenderString());
-  if (m_id != -1)
-    stmt.bind(4, m_id);
-  Logger::GetInstance().Log(query + "\n\tDATA: " + m_fullname + " " +
-                            getBirthDateString() + " " + getGenderString());
+  // Logger::GetInstance().Log(stmt.getExpandedSQL());
   stmt.executeStep();
+  query = "SELECT last_insert_rowid()";
+  stmt = {db, query};
+  stmt.executeStep();
+  m_id = stmt.getColumn(0);
+  Logger::GetInstance().Log("New Employee is at index: " +
+                            std::to_string(m_id));
+}
+
+void EmployeeModel::update(SQLite::Database &db) {
+  std::string query =
+      "UPDATE Employee SET fullname=?, birthDate=?, gender=? WHERE ID=?";
+  SQLite::Statement stmt(db, query);
+  stmt.bind(1, m_fullname);
+  stmt.bind(2, getBirthDateString());
+  stmt.bind(3, getGenderString());
+  stmt.bind(4, m_id);
+  Logger::GetInstance().Log(stmt.getExpandedSQL());
+  stmt.executeStep();
+}
+
+void EmployeeModel::insertUpdate(SQLite::Database &db) {
+  if (!isValid()) {
+    Logger::GetInstance().Error(
+        "Trying to insert/update invalid Employee object (all fields must be "
+        "initialized through constructor)");
+    return;
+  }
+  if (m_id == -1)
+    insert(db);
+  else
+    update(db);
 }
 
 int64_t EmployeeModel::getID() { return m_id; }
@@ -117,7 +149,7 @@ std::ostream &EmployeeModel::operator<<(std::ostream &out) {
   if (!isValid()) {
     Logger::GetInstance().Error(
         "Trying to print invalid Employee object (all fields must be "
-        "initialized through constructors)");
+        "initialized through constructor)");
     return out;
   }
   out << "Employee = { " << m_fullname << " ; " << m_birthDate << " ; "
@@ -126,8 +158,8 @@ std::ostream &EmployeeModel::operator<<(std::ostream &out) {
 }
 
 EmployeeModel::operator std::string() {
-  return "Employee = { " + m_fullname + " ; " + getBirthDateString() + " ; " +
-         getGenderString() + " }";
+  return "( '" + m_fullname + "' , '" + getBirthDateString() + "' , '" +
+         getGenderString() + "' )";
 }
 
 } // namespace ptmk

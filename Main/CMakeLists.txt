@@ -2,7 +2,7 @@ project(ptmk)
 
 set(CMAKE_BUILD_PARALLEL_LEVEL 16)
 
-set(SOURCE_FILES ./Source_Files/main.cpp ./Source_Files/AppSettings.cpp ./Source_Files/db.cpp ./Source_Files/EmployeeModel.cpp ./Source_Files/EmployeeGen.cpp ./Source_Files/Logger.cpp ./Source_Files/Application.cpp)
+set(SOURCE_FILES ./Source_Files/main.cpp ./Source_Files/AppSettings.cpp ./Source_Files/EmployeeModel.cpp ./Source_Files/EmployeeGen.cpp ./Source_Files/Logger.cpp ./Source_Files/Application.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 

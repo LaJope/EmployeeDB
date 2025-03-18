@@ -11,16 +11,15 @@
 
 namespace ptmk {
 
-enum EmployeeSort {
-  DESC,
-  EMPLOYEE_FULLNAME,
-  EMPLOYEE_BIRTHDATE,
-  EMPLOYEE_GENDER,
-};
-
 class EmployeeModel : IModel {
 public:
   enum Gender { MALE, FEMALE };
+  enum Sort {
+    DESC,
+    EMPLOYEE_FULLNAME,
+    EMPLOYEE_BIRTHDATE,
+    EMPLOYEE_GENDER,
+  };
 
 public:
   EmployeeModel();
@@ -29,19 +28,19 @@ public:
   ~EmployeeModel();
 
   static void CreateTable(SQLite::Database &);
-  static void InsertBunch(SQLite::Database &, std::vector<EmployeeModel> &);
-  static std::vector<EmployeeModel> selectAll(SQLite::Database &, uint8_t = 0);
-  static std::vector<EmployeeModel> selectFilter(SQLite::Database &,
-                                                 std::string, uint8_t);
+  static void InsertBunch(SQLite::Database &, std::vector<EmployeeModel> &&);
+  static std::vector<EmployeeModel> select(SQLite::Database &,
+                                           std::string options = "");
 
-  void insertInto(SQLite::Database &) override;
+  void insert(SQLite::Database &) override;
+  void update(SQLite::Database &) override;
+  void insertUpdate(SQLite::Database &) override;
 
+  bool isValid();
   int64_t getID();
   std::string getName();
   std::string getBirthDateString();
   std::string getGenderString();
-
-  bool isValid();
 
   std::ostream &operator<<(std::ostream &);
 
@@ -53,7 +52,7 @@ private:
   std::chrono::year_month_day m_birthDate;
   Gender m_gender;
 
-private:
+  inline static size_t MAX_BUNCH_SIZE = 1000000;
 };
 
 } // namespace ptmk

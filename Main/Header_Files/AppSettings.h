@@ -17,6 +17,8 @@ public:
 
   AppMode m_mode = MAX_MODE;
 
+  std::optional<std::string> m_query;
+
 public:
   AppSettings(int argc, char *argv[]);
 

@@ -5,12 +5,10 @@
 
 #include "EmployeeGen.h"
 #include "EmployeeModel.h"
-#include "Logger.h"
 
 // EmployeeGenerator public
 
 std::vector<ptmk::EmployeeModel> EmployeeGenerator::getEmployeeVector1M() {
-  Logger::GetInstance().Log("Start generating pseudorandom employees");
   std::vector<ptmk::EmployeeModel> result;
   result.reserve(UNIQUE_NAME_COUNT * 2);
   for (size_t ind = 0; ind < UNIQUE_NAME_COUNT; ind++) {
@@ -19,7 +17,6 @@ std::vector<ptmk::EmployeeModel> EmployeeGenerator::getEmployeeVector1M() {
     result.emplace_back(getFullname(false), getBirthDate(),
                         ptmk::EmployeeModel::FEMALE);
   }
-  Logger::GetInstance().Log("Finished generating pseudorandom employees");
   return result;
 }
 
@@ -52,6 +49,6 @@ std::chrono::year_month_day EmployeeGenerator::getBirthDate() {
   add = (add + 1) % BIRTHDAY_COUNT;
 
   return {START_BIRTHDAY.year() + std::chrono::years(currAdd / 12),
-          START_BIRTHDAY.month() + std::chrono::months(currAdd),
-          START_BIRTHDAY.day() + std::chrono::days(currAdd)};
+          START_BIRTHDAY.month() + std::chrono::months(currAdd % 11),
+          START_BIRTHDAY.day() + std::chrono::days(currAdd % 28)};
 }
