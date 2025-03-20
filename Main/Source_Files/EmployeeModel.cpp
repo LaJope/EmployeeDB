@@ -208,9 +208,9 @@ int64_t EmployeeModel::getID() { return m_id; }
 std::string EmployeeModel::getName() { return m_fullname; }
 std::string EmployeeModel::getBirthDateString() {
     std::ostringstream str;
-    str << std::setw(4) << static_cast<int>(date.year()) << "-"
-        << std::setw(2) << static_cast<unsigned>(date.month()) << "-"
-        << std::setw(2) << static_cast<unsigned>(date.day());
+    str << std::setw(4) << static_cast<int>(m_birthDate.year()) << "-"
+        << std::setw(2) << static_cast<uint>(m_birthDate.month()) << "-"
+        << std::setw(2) << static_cast<uint>(m_birthDate.day());
     return str.str();
 }
 std::string EmployeeModel::getGenderString() {
@@ -241,7 +241,7 @@ std::ostream &EmployeeModel::operator<<(std::ostream &out) {
         "initialized through constructor)");
     return out;
   }
-  out << "Employee = { " << m_fullname << " ; " << m_birthDate << " ; "
+  out << "Employee = { " << m_fullname << " ; " getBirthDateString() << " ; "
       << getGenderString() << " }";
   return out;
 }
