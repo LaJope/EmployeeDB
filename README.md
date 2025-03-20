@@ -1,16 +1,3 @@
-# [Проект на github](https://github.com/LaJope/EmployeeDB)
-
-# Перед запуском
-
-Программа подключается к серверу postgresql с именем postgres и паролем hello
-```
-postgresql://postgres:hello@localhost:5432/postgres
-```
-Можно запустить в docker
-```bash
-docker run -e POSTGRES_PASSWORD=hello -e POSTGRES_DB=postgres -d -p 5432:5432 postgres
-```
-
 ## Help
 usage: ptmk [-h | --help] [-v | --verbose] [-l | --logfile \<filename\>]
        mode [<Employee data for mode 2>]
@@ -51,9 +38,19 @@ cmake --build build
 ```
 The executable will be placed in ./build/bin/
 
+## Launch
+The program connects to postgres server
+```
+postgresql://postgres:hello@localhost:5432/postgres
+```
+You can easily launch the official postgres docker image with all the necessary information
+```bash
+docker run -e POSTGRES_PASSWORD=hello -e POSTGRES_DB=postgres -d -p 5432:5432 postgres
+```
+
 ## [Postgresql c++ library used in this project](https://github.com/jtv/libpqxx)
 
-
+---
 # Пункт 6
 ## При всех измерениях разброс времени ~~ 20 миллисекунд
 ## Без партиций
