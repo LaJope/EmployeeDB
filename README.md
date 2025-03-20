@@ -1,5 +1,16 @@
 # [Проект на github](https://github.com/LaJope/EmployeeDB)
 
+# Перед запуском
+
+Программа подключается к серверу postgresql с именем postgres и паролем hello
+```
+postgresql://postgres:hello@localhost:5432/postgres
+```
+Можно запустить в docker
+```bash
+docker run -e POSTGRES_PASSWORD=hello -e POSTGRES_DB=postgres -d -p 5432:5432 postgres
+```
+
 ## Help
 usage: ptmk [-h | --help] [-v | --verbose] [-l | --logfile \<filename\>]
        mode [<Employee data for mode 2>]
@@ -24,17 +35,12 @@ Arguments format:
 5 - Test querying the database with different variations of indexes.
 Writes test results to logfile
 
-## Dependencies ??
-For building the project you need to install g++, cmake, libpq
-and postgresql-server-dev-13.  
+## Dependencies
+For building the project you need to install g++ (that supports c++20), cmake, libpq and postgresql-server-dev-13 (or other version).
 You can install them using your prefered package manager. For example:
 #### Ubuntu
 ```bash
 sudo apt install g++ cmake libpq-dev postgresql-server-dev-13
-```
-#### Arch linux
-```bash
-sudo pacman -S g++ cmake postgresql-libs
 ```
 
 ## Build
@@ -100,3 +106,7 @@ SELECT * FROM Employee WHERE fullname LIKE 'F%' AND gender = 'Male';
 **Скорость с партициями и индексам fullname**: ~~ 90 миллисекунд  
 **Скорость с партициями и индексам gender**: ~~ 90 миллисекунд  
 **Скорость с партициями и индексам fullname и gender**: ~~ 90 миллисекунд  
+
+Всё время выполнения - на моей локальной машине. При тесте на сервере время
+выполнения запросов с left(fullname, 1) = 'F' в некоторых случаях снижалось до
+40 миллисекунд, а с LIKE оставалось примерно таким же.
