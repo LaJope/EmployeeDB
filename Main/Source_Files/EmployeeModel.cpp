@@ -212,6 +212,21 @@ std::string EmployeeModel::getBirthDateString() {
 std::string EmployeeModel::getGenderString() {
   return (m_gender == MALE ? "Male" : "Female");
 }
+int EmployeeModel::getAge() {
+  auto now = std::chrono::system_clock::now();
+
+  std::chrono::year_month_day ymd = {
+      std::chrono::floor<std::chrono::days>(now)};
+
+  int years =
+      static_cast<int>(ymd.year()) - static_cast<int>(m_birthDate.year());
+  int months =
+      static_cast<uint>(ymd.month()) - static_cast<uint>(m_birthDate.month());
+  int days =
+      static_cast<uint>(ymd.day()) - static_cast<uint>(m_birthDate.day());
+
+  return years - int(months < 0 || days < 0);
+}
 
 bool EmployeeModel::isValid() { return m_id != -2; }
 
@@ -229,7 +244,7 @@ std::ostream &EmployeeModel::operator<<(std::ostream &out) {
 
 EmployeeModel::operator std::string() {
   return "( '" + m_fullname + "' , '" + getBirthDateString() + "' , '" +
-         getGenderString() + "' )";
+         getGenderString() + "', '" + std::to_string(getAge()) + "' )";
 }
 
 } // namespace ptmk

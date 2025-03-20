@@ -42,6 +42,7 @@ public:
   std::string getName();
   std::string getBirthDateString();
   std::string getGenderString();
+  int getAge();
 
   std::ostream &operator<<(std::ostream &);
 
