@@ -1,4 +1,6 @@
 #include <ctime>
+#include <fstream>
+#include <ios>
 #include <iostream>
 #include <ostream>
 
@@ -6,7 +8,6 @@
 #include "Timer.h"
 
 // Logger public
-int a = 0;
 
 Logger &Logger::GetInstance() {
   static Logger logger;
@@ -14,7 +15,6 @@ Logger &Logger::GetInstance() {
 }
 
 void Logger::Write(const std::string &message, bool noNewline) {
-  std::lock_guard<std::mutex> lock(m_write_lock);
   std::cout << message;
   if (noNewline)
     std::cout << std::flush;
@@ -22,23 +22,26 @@ void Logger::Write(const std::string &message, bool noNewline) {
     std::cout << std::endl;
 }
 void Logger::Log(const std::string &message) {
-  if (m_verbose) {
-    std::lock_guard<std::mutex> lock(m_write_lock);
-    std::cout << "[LOG  " << Timer::GetTimeString() << "] " << message << std::endl;
-  }
+  if (m_verbose)
+    std::cout << "[LOG  " << Timer::GetTimeString() << "] " << message
+              << std::endl;
 }
 void Logger::Warning(const std::string &message) {
-  if (m_verbose) {
-    std::lock_guard<std::mutex> lock(m_write_lock);
-    std::cerr << "[WARN " << Timer::GetTimeString() << "] " << message << std::endl;
-  }
+  if (m_verbose)
+    std::cerr << "[WARN " << Timer::GetTimeString() << "] " << message
+              << std::endl;
 }
 
 void Logger::Error(const std::string &message) {
-  std::lock_guard<std::mutex> lock(m_write_lock);
-  std::cerr << "[ERR  " << Timer::GetTimeString() << "] " << message << std::endl;
+  std::cerr << "[ERR  " << Timer::GetTimeString() << "] " << message
+            << std::endl;
+}
+
+void Logger::FileLog(const std::string &message) {
+  std::ofstream logFile(m_logfile + ".log", std::ios_base::app);
+  logFile << "[LOG  " << Timer::GetTimeString() << "] " << message << "\n";
+  Log(message);
 }
 
 void Logger::SetVerbose(bool verbose) { m_verbose = verbose; }
-
-bool Logger::GetVerbose() { return m_verbose; }
+void Logger::SetLogfile(std::string logfile) { m_logfile = logfile; }

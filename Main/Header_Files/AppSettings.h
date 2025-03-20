@@ -13,11 +13,7 @@ class AppSettings {
 public:
   bool m_help = false;
 
-  std::string m_outfile = "ptmk";
-
   AppMode m_mode = MAX_MODE;
-
-  std::optional<std::string> m_query;
 
 public:
   AppSettings(int argc, char *argv[]);
@@ -42,13 +38,13 @@ private:
 
       {"1", [this]() { setMode(CREATE_TABLE); }},
       {"3", [this]() { setMode(SELECT); }},
-      {"4", [this]() { setMode(INSERT_BUNCH); }},
+      {"4", [this]() { setMode(INSERT_BULK); }},
       {"5", [this]() { setMode(SELECT_FILTER); }},
   };
 
   const std::unordered_map<std::string, OneArgHandle> OneArgs{
-      {"-o", [this](std::string v) { setOutfile(v); }},
-      {"--outfile", [this](std::string v) { setOutfile(v); }},
+      {"-o", [this](std::string v) { setLogfile(v); }},
+      {"--outfile", [this](std::string v) { setLogfile(v); }},
   };
 
   const std::unordered_map<std::string, ThreeArgHandle> ThreeArgs{
@@ -62,7 +58,7 @@ private:
 private:
   void setHelpToTrue();
   void setVerboseToTrue();
-  void setOutfile(std::string);
+  void setLogfile(std::string);
   void setMode(AppMode);
   void createEmployee(std::string, std::string, std::string);
 };

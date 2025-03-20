@@ -1,4 +1,5 @@
 #include <chrono>
+#include <functional>
 #include <string>
 
 class Timer {
@@ -8,5 +9,10 @@ public:
   static tp_sc GetTime();
 
   static std::string GetTimeString();
-  static std::string GetDifferenceString(const tp_sc &);
+  static long GetDifference(const tp_sc &);
+
+  static std::string TimeFunction(std::function<void(void)>);
+
+private:
+  Timer() = delete;
 };

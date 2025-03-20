@@ -1,19 +1,20 @@
 #pragma once
 
-#include "SQLiteCpp/Database.h"
 #include <vector>
+
+#include <pqxx/pqxx>
 
 namespace ptmk {
 
 class IModel {
 public:
   static void CreateTable();
-  static void InsertBunch(SQLite::Database &, std::vector<IModel> &);
-  static std::vector<IModel> selectAll(SQLite::Database &);
+  static void BulkInsert(pqxx::connection &, std::vector<IModel> &);
+  static std::vector<IModel> selectAll(pqxx::connection &);
 
-  virtual void insert(SQLite::Database &) = 0;
-  virtual void update(SQLite::Database &) = 0;
-  virtual void insertUpdate(SQLite::Database &) = 0;
+  virtual void insert(pqxx::connection &) = 0;
+  virtual void update(pqxx::connection &) = 0;
+  virtual void insertUpdate(pqxx::connection &) = 0;
 
   virtual ~IModel() {}
 };

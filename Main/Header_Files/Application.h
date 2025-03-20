@@ -4,18 +4,17 @@
 
 class Application {
 public:
-  Application(int argc, char *argv[]);
+  Application(std::string);
 
-  int run();
-
-private:
-  AppSettings m_settings;
-  // SQLite::Database m_db;
+  int run(AppSettings);
 
 private:
-  void create_table(SQLite::Database &);
-  void insertOne(SQLite::Database &);
-  void select(SQLite::Database &);
-  void randomized_insert_bunch(SQLite::Database &);
-  void select_filter(SQLite::Database &);
+  pqxx::connection m_conn;
+
+private:
+  void create_table();
+  void insertOne(ptmk::EmployeeModel);
+  void select();
+  void randomized_bulk_insert();
+  void select_filter();
 };

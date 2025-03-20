@@ -1,28 +1,31 @@
+#include <cstdlib>
 #include <cstring>
 #include <string>
 
+#include "AppSettings.h"
 #include "Application.h"
+#include "HelpMessage.h"
 #include "Logger.h"
 
 int main(int argc, char *argv[]) {
 
-  Application app(argc, argv);
-
+  AppSettings settings(argc, argv);
   Logger::GetInstance().Log("Finished processing command line arguments");
 
-  Logger::GetInstance().Log("Starting application");
+  if (settings.m_help) {
+    Logger::GetInstance().Write(helpMessage);
+    return EXIT_SUCCESS;
+  }
 
-  int retcode = app.run();
+  std::string psqlURL = "postgresql://postgres:hello@localhost:5432/postgres";
+  Application app(psqlURL);
+
+  Logger::GetInstance().Log("Starting application");
+  int retcode = app.run(settings);
 
   Logger::GetInstance().Log("Application finished with return code " +
                             std::string(strerror(retcode)));
 
-  // Logger::GetInstance().Log("Start generating pseudorandom employees");
-  // auto vec = EmployeeGenerator::getEmployeeVector1M();
-  // Logger::GetInstance().Log("Finished generating pseudorandom employees");
-  // std::cout << vec.capacity() * sizeof(vec[0]) / 8 / 1024 / 1024 <<
-  // std::endl;
-  //
   // int retcode = 0;
 
   return retcode;

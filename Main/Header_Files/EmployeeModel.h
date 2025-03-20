@@ -1,11 +1,12 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <ostream>
 #include <string>
 #include <vector>
 
-#include "SQLiteCpp/Database.h"
+#include <pqxx/pqxx>
 
 #include "IModel.h"
 
@@ -22,19 +23,19 @@ public:
   };
 
 public:
-  EmployeeModel();
+  EmployeeModel(int64_t, std::string, std::string, std::string);
   EmployeeModel(std::string, std::string, std::string);
   EmployeeModel(std::string, std::chrono::year_month_day, Gender);
   ~EmployeeModel();
 
-  static void CreateTable(SQLite::Database &);
-  static void InsertBunch(SQLite::Database &, std::vector<EmployeeModel> &&);
-  static std::vector<EmployeeModel> select(SQLite::Database &,
+  static void CreateTable(pqxx::connection &);
+  static void BulkInsert(pqxx::connection &, std::vector<EmployeeModel> &&);
+  static std::vector<EmployeeModel> select(pqxx::connection &,
                                            std::string options = "");
 
-  void insert(SQLite::Database &) override;
-  void update(SQLite::Database &) override;
-  void insertUpdate(SQLite::Database &) override;
+  void insert(pqxx::connection &) override;
+  void update(pqxx::connection &) override;
+  void insertUpdate(pqxx::connection &) override;
 
   bool isValid();
   int64_t getID();
@@ -52,7 +53,7 @@ private:
   std::chrono::year_month_day m_birthDate;
   Gender m_gender;
 
-  inline static size_t MAX_BUNCH_SIZE = 1000000;
+  inline static size_t MAX_PARAM_SIZE = 65535;
 };
 
 } // namespace ptmk

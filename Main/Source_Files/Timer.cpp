@@ -27,11 +27,18 @@ std::string Timer::GetTimeString() {
   return oss.str();
 }
 
-std::string Timer::GetDifferenceString(const tp_sc &time) {
+long Timer::GetDifference(const tp_sc &time) {
   using namespace std::chrono;
 
   const auto duration =
       duration_cast<milliseconds>(high_resolution_clock::now() - time);
 
-  return std::to_string(duration.count());
+  return duration.count();
+}
+
+std::string Timer::TimeFunction(std::function<void(void)> func) {
+  auto start = GetTime();
+  func();
+  auto funcTime = GetDifference(start);
+  return std::to_string(funcTime);
 }

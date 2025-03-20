@@ -60,8 +60,8 @@ ptmk::EmployeeModel AppSettings::getEmployee() {
 
 void AppSettings::setHelpToTrue() { m_help = true; }
 void AppSettings::setVerboseToTrue() { Logger::GetInstance().SetVerbose(true); }
-void AppSettings::setOutfile(std::string fileName) {
-  m_outfile = fileName.substr(0, fileName.find("."));
+void AppSettings::setLogfile(std::string fileName) {
+  Logger::GetInstance().SetLogfile(fileName.substr(0, fileName.find(".")));
 }
 void AppSettings::setMode(AppMode mode) {
   if (m_mode != MAX_MODE) {

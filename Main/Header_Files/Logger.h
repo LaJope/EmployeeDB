@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mutex>
 #include <string>
 
 class Logger {
@@ -15,13 +14,15 @@ public:
   void Warning(const std::string &);
   void Error(const std::string &);
 
-  void SetVerbose(bool);
+  void FileLog(const std::string &);
 
-  bool GetVerbose();
+  void SetVerbose(bool);
+  void SetLogfile(std::string);
 
 private:
-  std::mutex m_write_lock;
   bool m_verbose = false;
+
+  std::string m_logfile = "ptmk";
 
 private:
   Logger() {}

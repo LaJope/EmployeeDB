@@ -1,4 +1,4 @@
-project(ptmk)
+project(ptmk LANGUAGES CXX)
 
 set(CMAKE_BUILD_PARALLEL_LEVEL 16)
 
@@ -12,4 +12,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 target_include_directories(${PROJECT_NAME} PRIVATE ./Header_Files/)
 target_compile_options(${PROJECT_NAME} PRIVATE -Werror -Wall -Wextra)
-target_link_libraries(${PROJECT_NAME} SQLiteCpp sqlite3)
+target_link_libraries(${PROJECT_NAME} pqxx)
