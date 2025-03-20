@@ -22,13 +22,17 @@ EmployeeModel::EmployeeModel(std::string name, std::string birthDate,
                              std::string gender) {
   m_fullname = name;
   std::istringstream dateParse(birthDate);
-  dateParse >> std::chrono::parse("%Y-%m-%d", m_birthDate);
+  char dash;
+  int year, month, day;
+  dateParse >> year >> dash >> month >> dash >> day;
   if (dateParse.fail()) {
     Logger::GetInstance().Error("Failed to parse birth date. "
                                 "Object invalid. Date provided: " +
                                 birthDate);
     return;
   }
+  m_birthDate = {std::chrono::year(year), std::chrono::month(month),
+                 std::chrono::day(day)};
   if (gender != "Male" && gender != "Female") {
     Logger::GetInstance().Error("Failed to parse gender. "
                                 "Object invalid. Gender provided: " +
