@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <iomanip>
+#include <sstream>
 
 #include <pqxx/pqxx>
 
@@ -205,9 +207,11 @@ void EmployeeModel::insertUpdate(pqxx::connection &conn) {
 int64_t EmployeeModel::getID() { return m_id; }
 std::string EmployeeModel::getName() { return m_fullname; }
 std::string EmployeeModel::getBirthDateString() {
-  std::ostringstream str;
-  str << m_birthDate;
-  return str.str();
+    std::ostringstream str;
+    str << std::setw(4) << static_cast<int>(date.year()) << "-"
+        << std::setw(2) << static_cast<unsigned>(date.month()) << "-"
+        << std::setw(2) << static_cast<unsigned>(date.day());
+    return str.str();
 }
 std::string EmployeeModel::getGenderString() {
   return (m_gender == MALE ? "Male" : "Female");
